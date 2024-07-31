@@ -31,6 +31,8 @@ RUN chmod +x /usr/bin/entrypoint.sh
 ENV TZ=UTC
 RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+RUN echo "16 3 * * * /etc/mosdns/rules/update-cdn" > /etc/crontabs/root
+
 EXPOSE 53
 EXPOSE 9080
 
