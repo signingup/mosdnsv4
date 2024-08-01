@@ -1,6 +1,6 @@
 #!/bin/bash
 set -m
-FILE="/etc/mosdns/start.sh"
+FILE="/mosdns/start.sh"
 
 if [ -f "$FILE" ]; then
   cp "$FILE" /usr/bin/start
