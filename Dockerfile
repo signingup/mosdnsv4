@@ -1,20 +1,14 @@
-FROM ubuntu:22.04 AS base
-
-RUN apt-get update && apt-get install -y git
-
-WORKDIR /workspace/easymosdns
-RUN git clone https://github.com/signingup/easymosdns.git .
-
-WORKDIR /workspace/mosdns
-RUN git clone https://github.com/pmkol/mosdns.git .
-
 FROM golang:1.22.4-alpine AS builder
 
-COPY --from=base /workspace/mosdns /mosdns
+RUN apk update && apk add --no-cache git
+
+WORKDIR /easymosdns
+RUN git clone https://github.com/signingup/easymosdns.git . && rm -rf .git
+
+WORKDIR /mosdns
+RUN git clone https://github.com/pmkol/mosdns.git .
 
 #build mosdns
-WORKDIR /mosdns
-
 RUN go mod download
 RUN go build -o /go/bin/mosdns
 
@@ -23,7 +17,7 @@ FROM alpine:latest
 RUN apk add --no-cache git tzdata dcron openrc bash nano curl ca-certificates net-tools bind-tools
 
 COPY --from=builder /go/bin/. /usr/local/bin/
-COPY --from=base /workspace/easymosdns /etc/mosdns
+COPY --from=builder /easymosdns /etc/mosdns
 
 COPY ./entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
